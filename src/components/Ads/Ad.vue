@@ -2,7 +2,21 @@
   <v-container>
     <v-layout row>
       <v-flex xs12>
-        <h1>Ad</h1>
+        <v-card>
+          <v-card-media
+            src="https://vuetifyjs.com/static/doc-images/carousel/planet.jpg"
+            height="300px"
+          ></v-card-media>
+          <v-card-text>
+            <h1 class="text--primary">Lorem</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam, officia.</p>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn class="primary">Edit</v-btn>
+            <v-btn class="success">Buy</v-btn>
+          </v-card-actions>
+        </v-card>
       </v-flex>
     </v-layout>
   </v-container>
