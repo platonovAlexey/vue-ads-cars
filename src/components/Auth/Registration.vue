@@ -79,7 +79,6 @@
       loading () {
         return this.$store.getters.loading
       }
-
     },
     methods: {
       onSubmit () {
@@ -93,7 +92,7 @@
             .then(() => {
               this.$router.push('/')
             })
-            .catch(err => console.log(err))
+            .catch(() => {})
         }
       }
     }
