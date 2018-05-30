@@ -1,39 +1,90 @@
+import * as fb from 'firebase'
+
+class Ad {
+  constructor (title, description, ownerId, imageSrc = '', promo = false, id = null) {
+    this.title = title
+    this.description = description
+    this.ownerId = ownerId
+    this.imageSrc = imageSrc
+    this.promo = promo
+    this.id = id
+  }
+}
+
 export default {
   state: {
-    ads: [
-      {
-        title: 'First ad',
-        description: 'Hello i am description',
-        promo: false,
-        imageSrc: 'https://vuetifyjs.com/static/doc-images/carousel/planet.jpg',
-        id: '123'
-      },
-      {
-        title: 'Second ad',
-        description: 'Hello i am description',
-        promo: true,
-        imageSrc: 'https://vuetifyjs.com/static/doc-images/carousel/bird.jpg',
-        id: '1234'
-      },
-      {
-        title: 'Third ad',
-        description: 'Hello i am description',
-        promo: true,
-        imageSrc: 'https://vuetifyjs.com/static/doc-images/carousel/sky.jpg',
-        id: '12345'
-      }
-    ]
+    ads: []
   },
   mutations: {
     createAd (state, payload) {
       state.ads.push(payload)
+    },
+    loadAds (state, payload) {
+      state.ads = payload
     }
   },
   actions: {
-    createAd ({commit}, payload) {
-      payload.id = Math.random().toString()
+    async createAd ({commit, getters}, payload) {
+      commit('clearError')
+      commit('setLoading', true)
 
-      commit('createAd', payload)
+      const image = payload.image
+
+      try {
+        const newAd = new Ad(
+          payload.title,
+          payload.description,
+          getters.user.id,
+          '',
+          payload.promo
+        )
+
+        const ad = await fb.database().ref('ads').push(newAd)
+        const imageExt = image.name.slice(image.name.lastIndexOf('.'))
+
+        const fileData = await fb.storage().ref(`ads/${ad.key}.${imageExt}`).put(image)
+        const imageSrc = fileData.metadata.downloadURLs[0]
+
+        await fb.database().ref('ads').child(ad.key).update({
+          imageSrc
+        })
+
+        commit('setLoading', false)
+        commit('createAd', {
+          ...newAd,
+          id: ad.key,
+          imageSrc
+        })
+      } catch (error) {
+        commit('setError', error.message)
+        commit('setLoading', false)
+        throw error
+      }
+    },
+    async fetchAds ({commit}) {
+      commit('clearError')
+      commit('setLoading', true)
+
+      const resultAds = []
+
+      try {
+        const fbVal = await fb.database().ref('ads').once('value')
+        const ads = fbVal.val()
+
+        Object.keys(ads).forEach(key => {
+          const ad = ads[key]
+          resultAds.push(
+            new Ad(ad.title, ad.description, ad.ownerId, ad.imageSrc, ad.promo, key)
+          )
+        })
+
+        commit('loadAds', resultAds)
+        commit('setLoading', false)
+      } catch (error) {
+        commit('setError', error.message)
+        commit('setLoading', false)
+        throw error
+      }
     }
   },
   getters: {
