@@ -1,6 +1,6 @@
 <template>
   <v-dialog width="400px" v-model="modal">
-    <v-btn class="primary" flat slot="activator">Edit</v-btn>
+    <v-btn class="warning" flat slot="activator">Edit</v-btn>
 
     <v-card>
       <v-container>
@@ -36,8 +36,8 @@
           <v-flex xs12>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click="onCancel">Cancel</v-btn>
-              <v-btn class="success" @click="onSave">Save</v-btn>
+              <v-btn flat @click="onCancel">Cancel</v-btn>
+              <v-btn class="success" flat @click="onSave">Save</v-btn>
             </v-card-actions>
           </v-flex>
         </v-layout>

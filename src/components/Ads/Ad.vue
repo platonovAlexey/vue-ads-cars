@@ -19,10 +19,10 @@
         </v-card>
         <div v-else class="text-xs-center">
           <v-progress-circular
+            indeterminate
             :size="100"
             :width="4"
-            indeterminate
-            color="primary"
+            color="purple"
           ></v-progress-circular>
         </div>
       </v-flex>
@@ -37,13 +37,15 @@
     props: ['id'],
     computed: {
       ad () {
-        const id = this.id
-        return this.$store.getters.adById(id)
+        return this.$store.getters.adById(this.id)
       },
       loading () {
         return this.$store.getters.loading
       },
       isOwner () {
+        if (!this.$store.getters.user) {
+          return false
+        }
         return this.ad.ownerId === this.$store.getters.user.id
       }
     },
@@ -52,7 +54,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>
